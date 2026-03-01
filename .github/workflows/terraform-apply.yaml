@@ -121,13 +121,21 @@ jobs:
       - name: Checkout app-infrastructure
         uses: actions/checkout@v4
 
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.INFRA_APP_ID }}
+          private-key: ${{ secrets.INFRA_APP_PRIVATE_KEY }}
+          repositories: infrastructure-automation
+
       - name: Checkout infrastructure-automation
         uses: actions/checkout@v4
         with:
           repository: ${{ github.repository_owner }}/${{ env.INFRA_REPO }}
           path: infra
           ref: main
-          token: ${{ secrets.INFRA_REPO_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
